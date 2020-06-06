@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+
+:root {
+  --rownum: 1;
+  --colnum: 1;
+  --widthIncrement: 1px;
+  --heightIncrement: 1px;
+  --cellMargin: 2px;
+}
+
+.mycentre {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+.mytextinput {
+  text-align: center;
+}
+
+.mymargin {
+  margin-top: 25px;
+}
+
+.mybutton {
+  position: relative; left: 44.5%;
+  /* visibility: hidden; */
+}
+
+.mytopsection {
+  width: auto;
+  height: 50px;
+}
+
+body, button {
+  background-color: rgb(19, 19, 19);
+  font-size: 40px;
+  color: rgb(23, 32, 255)
+}
+
+button {
+  border-radius: 4px;
+  font-size: 0.4em;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  background-color: black;
+  border: 1px solid rgb(37, 149, 208);
+  color: white;
+  transition: 200ms;
+}
+
+button:hover {
+  background-color: rgb(32, 124, 174);
+  border: 1px solid rgb(32, 124, 174);
+}
+/*
+canvas {
+  background: rgb(255, 255, 255);
+} */
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(var(--colnum), var(--widthIncrement));
+  grid-template-rows: repeat(var(--rownum), var(--heightIncrement));
+  /* grid-gap: 3px; */
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.gridcell {
+  border: var(--cellMargin) solid black;
+  animation-fill-mode: both;
+}
+
+.slider {
+  width: 25%;
+  outline: none;
+  background-color: rgb(37, 149, 208);
+}

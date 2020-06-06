@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <link href="bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <meta charset="utf-8">
+    <title>Initial panel</title>
+  </head>
+  <body>
+    <div class="mytopsection">
+    </div>
+    <form action="/finder" method="POST">
+      <div class="jumbotron">
+        <div class="row">
+          <div class="col-sm">
+          </div>
+          <div class="col-sm">
+          </div>
+          <div class="col-sm">
+            <input id="colInput" onkeyup="check()" class="form-control mytextinput" type="text" name="ColCount" placeholder="Enter number of columns">
+          </div>
+          <div class="col-sm">
+          </div>
+          <div class="col-sm">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+          </div>
+          <div class="col-sm">
+          </div>
+          <div class="col-sm">
+            <input id="rowInput" onkeyup="check()" class="form-control mytextinput mymargin" type="text" name="RowCount" placeholder="Enter number of rows">
+          </div>
+          <div class="col-sm">
+          </div>
+          <div class="col-sm">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="jumbotron mycentre">
+          <div class="col-sm">
+          </div>
+          <div class="col-sm">
+            <button id="submitButton" class="btn btn-outline-primary mybutton" type="submit">Continue</button>
+          </div>
+          <div class="col-sm">
+          </div>
+        </div>
+      </div>
+    </form>
+  </body>
+</html>
+<script type="text/javascript">
+let colInput = document.getElementById("colInput")
+let rowInput = document.getElementById("rowInput")
+let submitButton = document.getElementById("submitButton")
+
+function check() {
+  if ((colInput.value != "") && (rowInput.value != "")) {
+    submitButton.style.visibility = "visible"
+  } else {
+    submitButton.style.visibility = "hidden"
+  }
+}
+</script>
