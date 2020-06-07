@@ -1,13 +1,13 @@
 document.documentElement.style.setProperty("--colnum", cols);
 document.documentElement.style.setProperty("--rownum", rows);
-const cellMargin = 2;
+const cellMargin = 5;
 document.documentElement.style.setProperty("--cellMargin", cellMargin + "px");
 const w = window.innerWidth;
 const h = 0.85*window.innerHeight
 document.documentElement.style.setProperty("--widthIncrement", Math.floor(w/cols) + "px");
 document.documentElement.style.setProperty("--heightIncrement", Math.floor(h/rows) + "px");
 
-const fps = 300;
+const fps = 60;
 const allowDiagonals = true;
 var grid;
 var start;
@@ -19,7 +19,7 @@ var openSet = [];
 var exploredSet = [];
 var drawing;
 var erasing;
-const states = ["idle", "running", "finished"]
+const states = ["idle", "running", "paused", "finished"]
 var pointer = 0;
 
 for (let i = 0; i < rows; i++) {
@@ -35,24 +35,25 @@ for (let i = 0; i < rows; i++) {
 
 const container = document.getElementById("container")
 container.addEventListener("mousedown", () => {
-  // event.preventDefault();
-  if (event.button == 0) {
-    drawing = true;
-    let [i, j] = event.target.id.split("-");
-    if (!((i == 0 && j == 0) || (i == cols - 1 && j == rows - 1))) {
-      grid[i][j].blocked = true;
-      document.getElementById(event.target.id).style.backgroundColor = "black";
+  if ((pointer == 0) || (pointer == 3)) {
+    if (event.button == 0) {
+      drawing = true;
+      let [i, j] = event.target.id.split("-");
+      if (!((i == 0 && j == 0) || (i == cols - 1 && j == rows - 1))) {
+        grid[i][j].blocked = true;
+        document.getElementById(event.target.id).style.backgroundColor = "black";
+      }
+    } else if (event.button == 2) {
+      erasing = true;
+      let [i, j] = event.target.id.split("-");
+      if (!((i == 0 && j == 0) || (i == cols - 1 && j == rows - 1))) {
+        grid[i][j].blocked = false;
+        document.getElementById(event.target.id).style.backgroundColor = "white";
+      }
+    } else {
+      drawing = false;
+      erasing = false;
     }
-  } else if (event.button == 2) {
-    erasing = true;
-    let [i, j] = event.target.id.split("-");
-    if (!((i == 0 && j == 0) || (i == cols - 1 && j == rows - 1))) {
-      grid[i][j].blocked = false;
-      document.getElementById(event.target.id).style.backgroundColor = "white";
-    }
-  } else {
-    drawing = false;
-    erasing = false;
   }
 });
 container.addEventListener("mouseup", () => {
@@ -114,6 +115,12 @@ class Cell {
     this.previous = []
     this.value = Math.random(1);
     this.blocked = false;
+  }
+  refresh() {
+    this.f = 9999;
+    this.g = 9999;
+    this.h = undefined;
+    this.previous = []
   }
   show(col) {
     if (this.blocked == true) {
@@ -204,41 +211,87 @@ function displaySets() {
 }
 
 function a_star() {
-  mainloop:
-  while (openSet.length > 0) {
+  console.log(openSet, 1)
+  displaySets();
+  if (openSet.length > 0) {
+    console.log(openSet, 2)
     current = openSet[0]
     for (var a=0; a<openSet.length; a++) {
       if (openSet[a].f < current.f) {
         current = openSet[a]
+        console.log(openSet, 3)
       }
     }
     if (current == end) {
+      console.log(openSet, 4)
       console.log("COMPLETE")
+      document.getElementById("button").innerHTML = "Restart"
+      pointer = 3;
+      clearInterval(interval);
       displaySets();
       reconstruct_path(current);
-      break mainloop;
     } else {
+      console.log(openSet, 5)
       removeElement(openSet, current);
       exploredSet.push(current);
       let neighbours = current.getNeighbours();
       for (b=0; b<neighbours.length; b++) {
         var neighbour = neighbours[b]
+        console.log(openSet, 6)
+        console.log(current);
+        console.log(neighbour)
         tentative_g = current.g + 1;
         if (tentative_g < neighbour.g) {
+          console.log(openSet, 7);
           neighbour.g = tentative_g;
           neighbour.previous = current;
           neighbour.h = heuristic(neighbour, end)
           neighbour.f = neighbour.g + neighbour.h
           if (!(openSet.includes(neighbour))) {
+            console.log(openSet, 8);
             openSet.push(neighbour)
           }
         }
       }
     }
+  } else {
+    console.log("NO SOLUTION")
+    document.getElementById("button").innerHTML = "Restart"
+    pointer = 3;
+    clearInterval(interval)
+  };
+}
+
+function buttonClicked() {
+  var button = document.getElementById("button");
+  if (states[pointer] == "idle") {
+    openSet.push(start)
+    pointer = 1;
+    button.innerHTML = "Pause"
+    interval = setInterval(a_star, 1000/fps);
+  } else if (states[pointer] == "running") {
+      button.innerHTML = "Resume"
+      pointer = 2;
+      clearInterval(interval)
+  } else if (states[pointer] == "paused") {
+      button.innerHTML = "Pause"
+      pointer = 1;
+      interval = setInterval(a_star, 1000/fps)
+  } else {
+    openSet = []
+    exploredSet = []
+    for (var i=0; i<cols; i++) {
+      for (var j=0; j<rows; j++) {
+        grid[i][j].refresh();
+        grid[i][j].show("white")
+      }
+    }
+    start.g = 0;
+    start.h = heuristic(start, end)
+    start.f = start.g + start.h
+    pointer = 0;
+    button.innerHTML = "Start"
   }
-  console.log("NO SOLUTION")
 }
 
 createGrid();
-openSet.push(start)
-// a_star()

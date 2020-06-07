@@ -19,7 +19,7 @@ app.post("/finder", (req, res) => {
 })
 
 app.get("/test", (req, res) => {
-  res.render("finder", {data: {cols: 16, rows: 9}});
+  res.render("finder", {data: {cols: 100, rows: 50}});
 })
 
 app.listen(3000)

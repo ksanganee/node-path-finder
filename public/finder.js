@@ -1,14 +1,24 @@
 document.documentElement.style.setProperty("--colnum", cols);
 document.documentElement.style.setProperty("--rownum", rows);
-const cellMargin = 5;
+const cellMargin = 1;
 document.documentElement.style.setProperty("--cellMargin", cellMargin + "px");
 const w = window.innerWidth;
-const h = 0.85*window.innerHeight
-document.documentElement.style.setProperty("--widthIncrement", Math.floor(w/cols) + "px");
-document.documentElement.style.setProperty("--heightIncrement", Math.floor(h/rows) + "px");
+const h = 0.85 * window.innerHeight;
+document.documentElement.style.setProperty(
+  "--widthIncrement",
+  Math.floor(w / cols) + "px"
+);
+document.documentElement.style.setProperty(
+  "--heightIncrement",
+  Math.floor(h / rows) + "px"
+);
 
-const fps = 10;
-const allowDiagonals = true;
+const openSetCol = "rgb(29, 113, 164)";
+const closedSetCol = "rgb(60, 60, 60)";
+const pathCol = "purple";
+const startCol = "rgb(72, 196, 91)"
+const endCol = "red"
+
 var grid;
 var start;
 var end;
@@ -19,8 +29,18 @@ var openSet = [];
 var exploredSet = [];
 var drawing;
 var erasing;
-const states = ["idle", "running", "paused", "finished"]
+const states = ["idle", "running", "paused", "finished"];
 var pointer = 0;
+
+function updateconstants() {
+  allowDiagonals = document.getElementById("diagonalbox").checked;
+  renderSets = !document.getElementById("instantpathbox").checked;
+  if (renderSets == false) {
+    fps = "";
+  } else {
+    fps = document.getElementById("fpsbox").value;
+  }
+}
 
 for (let i = 0; i < rows; i++) {
   for (let j = 0; j < cols; j++) {
@@ -33,22 +53,69 @@ for (let i = 0; i < rows; i++) {
   }
 }
 
-const container = document.getElementById("container")
+document.addEventListener("keydown", () => {
+  if (event.key == "r" && event.metaKey == true) {
+    event.preventDefault()
+    openSet = [];
+    exploredSet = [];
+    for (var i = 0; i < cols; i++) {
+      for (var j = 0; j < rows; j++) {
+        grid[i][j].refresh();
+        grid[i][j].show("white");
+      }
+    }
+    start.g = 0;
+    start.h = heuristic(start, end);
+    start.f = start.g + start.h;
+    pointer = 0;
+    start.show(startCol);
+    end.show(endCol);
+    button.innerHTML = "start";
+  }
+})
+
+document.addEventListener("keypress", () => {
+  if (event.key == "Enter") {
+    event.preventDefault()
+    buttonClicked();
+  } else if (event.key == "r" && event.ctrlKey == true) {
+    event.preventDefault()
+    openSet = [];
+    exploredSet = [];
+    for (var i = 0; i < cols; i++) {
+      for (var j = 0; j < rows; j++) {
+        grid[i][j].refresh();
+        grid[i][j].show("white");
+      }
+    }
+    start.g = 0;
+    start.h = heuristic(start, end);
+    start.f = start.g + start.h;
+    pointer = 0;
+    start.show(startCol);
+    end.show(endCol);
+    button.innerHTML = "start";
+  }
+});
+
+const container = document.getElementById("container");
 container.addEventListener("mousedown", () => {
-  if ((pointer == 0) || (pointer == 3)) {
+  if (pointer == 0 || pointer == 3) {
     if (event.button == 0) {
       drawing = true;
       let [i, j] = event.target.id.split("-");
       if (!((i == 0 && j == 0) || (i == cols - 1 && j == rows - 1))) {
         grid[i][j].blocked = true;
-        document.getElementById(event.target.id).style.backgroundColor = "black";
+        document.getElementById(event.target.id).style.backgroundColor =
+          "black";
       }
     } else if (event.button == 2) {
       erasing = true;
       let [i, j] = event.target.id.split("-");
       if (!((i == 0 && j == 0) || (i == cols - 1 && j == rows - 1))) {
         grid[i][j].blocked = false;
-        document.getElementById(event.target.id).style.backgroundColor = "white";
+        document.getElementById(event.target.id).style.backgroundColor =
+          "white";
       }
     } else {
       drawing = false;
@@ -62,7 +129,7 @@ container.addEventListener("mouseup", () => {
 });
 container.addEventListener("contextmenu", () => {
   event.preventDefault();
-})
+});
 
 function cellHovered(id, j, i) {
   let div = document.getElementById(id);
@@ -72,13 +139,13 @@ function cellHovered(id, j, i) {
       div.style.backgroundColor = "black";
     } else if (erasing == true) {
       grid[i][j].blocked = false;
-      div.style.backgroundColor = "white"
+      div.style.backgroundColor = "white";
     }
   }
 }
 
 function removeElement(arr, elem) {
-  for (let z=arr.length-1; z >= 0; z--) {
+  for (let z = arr.length - 1; z >= 0; z--) {
     if (arr[z] == elem) {
       arr.splice(z, 1);
     }
@@ -92,6 +159,8 @@ function sliderChanged() {
       grid[i][j].show("white");
     }
   }
+  start.show(startCol);
+  end.show(endCol);
 }
 
 function heuristic(a, b) {
@@ -99,7 +168,7 @@ function heuristic(a, b) {
   if (allowDiagonals == true) {
     d = Math.sqrt(Math.pow(a.i - b.i, 2) + Math.pow(a.j - b.j, 2));
   } else {
-    d = Math.abs(a.i-b.i) + Math.abs(a.j-b.j)
+    d = Math.abs(a.i - b.i) + Math.abs(a.j - b.j);
   }
   return d;
 }
@@ -108,11 +177,11 @@ class Cell {
   constructor(i, j) {
     this.i = i;
     this.j = j;
-    this.div = document.getElementById(this.i + "-" + this.j)
+    this.div = document.getElementById(this.i + "-" + this.j);
     this.f = 9999;
     this.g = 9999;
     this.h = undefined;
-    this.previous = []
+    this.previous = [];
     this.value = Math.random(1);
     this.blocked = false;
   }
@@ -120,7 +189,7 @@ class Cell {
     this.f = 9999;
     this.g = 9999;
     this.h = undefined;
-    this.previous = []
+    this.previous = [];
   }
   show(col) {
     if (this.blocked == true) {
@@ -129,7 +198,7 @@ class Cell {
     this.div.style.backgroundColor = col;
   }
   getNeighbours() {
-    var arr = []
+    var arr = [];
     if (this.i < cols - 1) {
       arr.push(grid[this.i + 1][this.j]);
     }
@@ -155,8 +224,8 @@ class Cell {
       if (this.i < cols - 1 && this.j < rows - 1) {
         arr.push(grid[this.i + 1][this.j + 1]);
       }
-    };
-    for (let y=arr.length-1; y >= 0; y--) {
+    }
+    for (let y = arr.length - 1; y >= 0; y--) {
       if (arr[y].blocked == true) {
         arr.splice(y, 1);
       }
@@ -169,7 +238,10 @@ class Cell {
     } else {
       this.blocked = false;
     }
-    if ((this.i == 0 && this.j == 0) || (this.i == cols - 1 && this.j == rows - 1)) {
+    if (
+      (this.i == 0 && this.j == 0) ||
+      (this.i == cols - 1 && this.j == rows - 1)
+    ) {
       this.blocked = false;
     }
   }
@@ -184,114 +256,116 @@ function createGrid() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       grid[i][j] = new Cell(i, j);
-      grid[i][j].show("white")
+      grid[i][j].updateBlocked()
+      grid[i][j].show("white");
     }
   }
   start = grid[0][0];
-  end = grid[cols-1][rows-1]
+  end = grid[cols-1][rows-1];
   start.g = 0;
-  start.h = heuristic(start, end)
-  start.f = start.g + start.h
+  start.h = heuristic(start, end);
+  start.f = start.g + start.h;
+  start.show(startCol);
+  end.show(endCol);
 }
 
 function reconstruct_path(cur) {
-  cur.show("blue")
+  cur.show(pathCol);
   if (cur.previous.previous) {
-    reconstruct_path(cur.previous)
+    reconstruct_path(cur.previous);
   }
+  start.show(startCol);
+  end.show(endCol);
 }
 
 function displaySets() {
-  for (let d=0; d<openSet.length; d++) {
-    openSet[d].show("green")
+  if (renderSets == true || pointer == 3) {
+    for (let d = 0; d < openSet.length; d++) {
+      openSet[d].show(openSetCol);
+    }
+    for (let e = 0; e < exploredSet.length; e++) {
+      exploredSet[e].show(closedSetCol);
+    }
   }
-  for (let e=0; e<exploredSet.length; e++) {
-    exploredSet[e].show("red")
-  }
+  start.show(startCol);
+  end.show(endCol);
 }
 
 function a_star() {
-  console.log(openSet, 1)
   displaySets();
   if (openSet.length > 0) {
-    console.log(openSet, 2)
-    current = openSet[0]
-    for (var a=0; a<openSet.length; a++) {
+    current = openSet[0];
+    for (var a = 0; a < openSet.length; a++) {
       if (openSet[a].f < current.f) {
-        current = openSet[a]
-        console.log(openSet, 3)
+        current = openSet[a];
       }
     }
     if (current == end) {
-      console.log(openSet, 4)
-      console.log("COMPLETE")
-      document.getElementById("button").innerHTML = "Restart"
+      console.log("COMPLETE");
+      document.getElementById("button").innerHTML = "restart";
       pointer = 3;
       clearInterval(interval);
       displaySets();
       reconstruct_path(current);
     } else {
-      console.log(openSet, 5)
       removeElement(openSet, current);
       exploredSet.push(current);
       let neighbours = current.getNeighbours();
-      for (b=0; b<neighbours.length; b++) {
-        var neighbour = neighbours[b]
-        console.log(openSet, 6)
-        console.log(current);
-        console.log(neighbour)
+      for (b = 0; b < neighbours.length; b++) {
+        var neighbour = neighbours[b];
         tentative_g = current.g + 1;
         if (tentative_g < neighbour.g) {
-          console.log(openSet, 7);
           neighbour.g = tentative_g;
           neighbour.previous = current;
-          neighbour.h = heuristic(neighbour, end)
-          neighbour.f = neighbour.g + neighbour.h
-          if (!(openSet.includes(neighbour))) {
-            console.log(openSet, 8);
-            openSet.push(neighbour)
+          neighbour.h = heuristic(neighbour, end);
+          neighbour.f = neighbour.g + neighbour.h;
+          if (!openSet.includes(neighbour)) {
+            openSet.push(neighbour);
           }
         }
       }
     }
   } else {
-    console.log("NO SOLUTION")
-    document.getElementById("button").innerHTML = "Restart"
+    console.log("NO SOLUTION");
+    document.getElementById("button").innerHTML = "restart";
     pointer = 3;
-    clearInterval(interval)
-  };
+    clearInterval(interval);
+  }
 }
 
 function buttonClicked() {
   var button = document.getElementById("button");
   if (states[pointer] == "idle") {
-    openSet.push(start)
+    openSet.push(start);
     pointer = 1;
-    button.innerHTML = "Pause"
-    interval = setInterval(a_star, 1000/fps);
+    button.innerHTML = "pause";
+    interval = setInterval(a_star, 1000 / fps);
   } else if (states[pointer] == "running") {
-      button.innerHTML = "Resume"
-      pointer = 2;
-      clearInterval(interval)
+    button.innerHTML = "resume";
+    pointer = 2;
+    clearInterval(interval);
   } else if (states[pointer] == "paused") {
-      button.innerHTML = "Pause"
-      pointer = 1;
-      interval = setInterval(a_star, 1000/fps)
+    button.innerHTML = "pause";
+    pointer = 1;
+    interval = setInterval(a_star, 1000 / fps);
   } else {
-    openSet = []
-    exploredSet = []
-    for (var i=0; i<cols; i++) {
-      for (var j=0; j<rows; j++) {
+    openSet = [];
+    exploredSet = [];
+    for (var i = 0; i < cols; i++) {
+      for (var j = 0; j < rows; j++) {
         grid[i][j].refresh();
-        grid[i][j].show("white")
+        grid[i][j].show("white");
       }
     }
     start.g = 0;
-    start.h = heuristic(start, end)
-    start.f = start.g + start.h
+    start.h = heuristic(start, end);
+    start.f = start.g + start.h;
     pointer = 0;
-    button.innerHTML = "Start"
+    start.show(startCol);
+    end.show(endCol);
+    button.innerHTML = "start";
   }
 }
 
+updateconstants();
 createGrid();
