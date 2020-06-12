@@ -15,7 +15,7 @@ document.documentElement.style.setProperty(
 
 const openSetCol = "rgb(29, 113, 164)";
 const closedSetCol = "rgb(60, 60, 60)";
-const pathCol = "purple";
+const pathCol = "orange";
 const startCol = "rgb(72, 196, 91)"
 const endCol = "red"
 
@@ -261,7 +261,7 @@ function createGrid() {
     }
   }
   start = grid[0][0];
-  end = grid[cols-1][rows-1];
+  end = grid[cols - 1][rows - 1];
   start.g = 0;
   start.h = heuristic(start, end);
   start.f = start.g + start.h;
