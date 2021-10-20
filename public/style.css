@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+body {
+  font-family: 'Fira Code', monospace;
+}
+
+:root {
+  --rownum: 1;
+  --colnum: 1;
+  --widthIncrement: 1px;
+  --heightIncrement: 1px;
+  --cellMargin: 2px;
+}
+
+.mycentre {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+.mytextinput {
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+.mymargin {
+  margin-top: 25px;
+}
+
+.mybutton {
+  position: relative;
+  left: 44.5%;
+  visibility: hidden;
+}
+
+.mytopsection {
+  width: auto;
+  height: 50px;
+}
+
+body, button {
+  background-color: rgb(19, 19, 19);
+  font-size: 40px;
+  color: rgb(23, 32, 255)
+}
+
+button {
+  border-radius: 4px;
+  /* font-size: 0.4em; */
+  font-size: 18px;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  background-color: black;
+  border: 1px solid rgb(37, 149, 208);
+  color: white;
+  transition: 200ms;
+}
+
+button:hover {
+  background-color: rgb(32, 124, 174);
+  border: 1px solid rgb(32, 124, 174);
+}
+
+/*
+canvas {
+  background: rgb(255, 255, 255);
+} */
+.container {
+  display: grid;
+  grid-template-columns: repeat(var(--colnum), var(--widthIncrement));
+  grid-template-rows: repeat(var(--rownum), var(--heightIncrement));
+  /* grid-gap: 3px; */
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.gridcell {
+  border: var(--cellMargin) solid black;
+  transition: background-color 250ms ease;
+}
+
+.slider {
+  width: 25%;
+  outline: none;
+  background-color: rgb(37, 149, 208);
+  margin-right: 15px;
+}
+
+.type2 {
+  width: 100%;
+  height: 100%;
+  background: #ccc;
+  border: 3px solid #000;
+}
+
+.lrgap {
+  margin-left: 20px;
+}
+
+label {
+  display: inline;
+}
+
+.fpsbox {
+  text-align: center;
+  width: 2%;
+  margin-left: 2px;
+  margin-bottom: 2px;
+}
+
+.backbtn {
+  margin-left: 32px;
+}
+
+#constants-row {
+  text-align: center;
+  width: 100%;
+  font-size: 18px;
+  color: white;
+  margin-top: 8px;
+  margin-bottom: 5px;
+}

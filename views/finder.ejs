@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>A Star Finder</title>
+    <script>
+      const cols = <%= data.cols %>
+      const rows = <%= data.rows %>
+    </script>
+    <script defer src="finder.js"></script>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <!-- <link href="bootstrap.css" rel="stylesheet" type="text/css"> -->
+  </head>
+  <body>
+    <!-- <canvas id="canvas"></canvas> -->
+    <div id="container" class="container">
+    </div>
+    <div id="constants-row">
+      <input type="range" min="0" max="1000" value="200" class="slider" id="slider" oninput="sliderChanged()">
+      <label class="lrgap">allow diagonals <input id="diagonalbox" type="checkbox" checked="checked" oninput="updateconstants()"></label>
+      <label class="lrgap">instant path <input id="instantpathbox" type="checkbox" oninput="updateconstants()"></label>
+      <label class="lrgap">fps <input class="fpsbox" id="fpsbox" type="text" value="30" oninput="updateconstants()"></label>
+      <button class="btn btn-outline-primary backbtn" onclick="window.location.href='/';">back</button>
+      <!-- <button class="btn btn-outline-primary backbtn" onclick="location.reload()">restart</button> -->
+    </div>
+    <div style="text-align: center">
+      <button type="button" class="btn btn-outline-primary" onclick="buttonClicked()" id="button">start</button>
+    </div>
+  </body>
+</html>
